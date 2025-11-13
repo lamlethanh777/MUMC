@@ -5,7 +5,7 @@ Evaluates a trained model on test set and logs results
 import argparse
 import os
 import sys
-import ruamel_yaml as yaml
+import ruamel.yaml as yaml
 import time
 import datetime
 import json
