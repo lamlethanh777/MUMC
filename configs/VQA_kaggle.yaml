@@ -1,0 +1,42 @@
+# Local configuration for VQA training/testing
+# Updated paths for local environment
+
+rad:
+  train_file: [ '/kaggle/input/mevf-datasets/data_RAD/trainset.json' ]
+  test_file: [ '/kaggle/input/mevf-datasets/data_RAD/testset.json' ]
+  answer_list: '/kaggle/input/mevf-datasets/data_RAD/answer_all_list.json'
+  vqa_root: '/kaggle/input/mevf-datasets/data_RAD/images/'
+
+pathvqa:
+  train_file: [ '/kaggle/input/mevf-datasets/data_PathVQA/trainset.json',
+                '/kaggle/input/mevf-datasets/data_PathVQA/valset.json' ]
+  test_file: [ '/kaggle/input/mevf-datasets/data_PathVQA/testset.json' ]
+  answer_list: '/kaggle/input/mevf-datasets/data_PathVQA/answer_trainval_list.json'
+  vqa_root: '/kaggle/input/mevf-datasets/data_PathVQA/images/'
+
+slake:
+  train_file: [ '/kaggle/input/slake-vqa/Slake1.0/train.json',
+                '/kaggle/input/slake-vqa/Slake1.0/validate.json' ]
+  test_file: [ '/kaggle/input/slake-vqa/Slake1.0/test.json' ]
+  answer_list: '/kaggle/input/slake-vqa/Slake1.0/answer_trainval_list.json'
+  vqa_root: '/kaggle/input/slake-vqa/Slake1.0/imgs/'
+
+# Model hyperparameters
+image_res: 384      # Image resolution: 480, 384, or 256
+batch_size_train: 8
+batch_size_test: 4
+k_test: 128         # Top-k answers to consider during testing
+
+# Training parameters
+alpha: 0.4          # Weight for contrastive loss
+distill: True       # Use knowledge distillation
+warm_up: True       # Use learning rate warmup
+
+eos: '[SEP]'
+bert_config: 'configs/config_bert.json'
+
+# Optimizer settings
+init_lr: 2e-5
+weight_decay: 0.05
+min_lr: 1e-8
+max_epoch: 40

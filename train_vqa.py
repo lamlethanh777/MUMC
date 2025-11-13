@@ -202,7 +202,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset_use', default='rad', help='choose medical vqa dataset(rad, pathvqa, slake)')
     parser.add_argument('--is_save_path', default=False)
-    parser.add_argument('--checkpoint', default='/mnt/sda/lpf/weights/output/V2/pretrain/std/med_pretrain_29.pth')
+    parser.add_argument('--checkpoint', default='./pretrain/med_pretrain_29.pth')
+    parser.add_argument('--config', default='./configs/VQA_kaggle.yaml',
+                       help='Path to config file (VQA_kaggle.yaml for Kaggle paths, VQA_local.yaml for local)')
     parser.add_argument('--output_suffix', default='', help='output suffix, eg. ../rad_29_1')
     parser.add_argument('--output_dir', default='', help='the final output path, need not to assign')
     parser.add_argument('--evaluate', action='store_true')
@@ -216,9 +218,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    args.output_dir = '/mnt/sda/lpf/weights/output/V2/vqa/' + args.dataset_use + args.output_suffix
+    args.output_dir = './output/V2/vqa/' + args.dataset_use + args.output_suffix
 
-    config = yaml.load(open('./configs/VQA.yaml', 'r'), Loader=yaml.Loader)
+    config = yaml.load(open(args.config, 'r'), Loader=yaml.Loader)
 
     args.result_dir = os.path.join(args.output_dir, 'result')
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
