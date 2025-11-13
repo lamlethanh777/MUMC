@@ -159,15 +159,36 @@ class MUMC_VQA(nn.Module):
         question_states = tile(question_states, 0, k)
         question_atts = tile(question_atts, 0, k)
 
-        output = self.text_decoder(input_ids,
-                                   attention_mask=input_atts,
-                                   encoder_hidden_states=question_states,
-                                   encoder_attention_mask=question_atts,
-                                   labels=targets_ids,
-                                   return_dict=True,
-                                   reduction='none')
-
-        answer_loss = output.loss
+        # Process in chunks to reduce memory usage
+        chunk_size = 32  # Process 32 answers at a time
+        total_samples = input_ids.size(0)
+        answer_loss_list = []
+        
+        for i in range(0, total_samples, chunk_size):
+            end_idx = min(i + chunk_size, total_samples)
+            
+            chunk_input_ids = input_ids[i:end_idx]
+            chunk_input_atts = input_atts[i:end_idx]
+            chunk_targets_ids = targets_ids[i:end_idx]
+            chunk_question_states = question_states[i:end_idx]
+            chunk_question_atts = question_atts[i:end_idx]
+            
+            output = self.text_decoder(chunk_input_ids,
+                                       attention_mask=chunk_input_atts,
+                                       encoder_hidden_states=chunk_question_states,
+                                       encoder_attention_mask=chunk_question_atts,
+                                       labels=chunk_targets_ids,
+                                       return_dict=True,
+                                       reduction='none')
+            
+            answer_loss_list.append(output.loss)
+            
+            # Clear intermediate tensors
+            del output, chunk_input_ids, chunk_input_atts, chunk_targets_ids
+            del chunk_question_states, chunk_question_atts
+            torch.cuda.empty_cache()
+        
+        answer_loss = torch.cat(answer_loss_list, dim=0)
         answer_loss = answer_loss.view(input_ids.size(0), -1)
 
         # topk_prob: first token probability
