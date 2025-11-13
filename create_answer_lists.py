@@ -111,56 +111,63 @@ def main():
     parser = argparse.ArgumentParser(description='Generate answer lists for VQA datasets')
     parser.add_argument('--data_root', type=str, default='.',
                        help='Root directory containing data folders (use /kaggle/input/mevf-datasets for Kaggle)')
+    parser.add_argument('--output_root', type=str, default=None,
+                       help='Root directory for output files (use /kaggle/working for Kaggle, defaults to data_root)')
     parser.add_argument('--datasets', nargs='+', choices=['rad', 'pathvqa', 'slake', 'all'],
                        default=['all'], help='Which datasets to process (default: all available)')
     
     args = parser.parse_args()
     data_root = args.data_root
+    output_root = args.output_root if args.output_root else data_root
     
     print("="*80)
     print("VQA Answer List Generator")
     print("="*80)
     print("\nThis script creates answer list files required for VQA evaluation.")
     print("Answer lists contain all unique answers from training/validation data.")
-    print(f"\nData root: {data_root}\n")
+    print(f"\nData root (input): {data_root}")
+    print(f"Output root: {output_root}\n")
     
     # Define datasets and their files
     datasets = {}
     
     # VQA-RAD
     if 'all' in args.datasets or 'rad' in args.datasets:
-        rad_root = os.path.join(data_root, 'data_RAD') if data_root != '.' else 'data_RAD'
+        rad_input = os.path.join(data_root, 'data_RAD') if data_root != '.' else 'data_RAD'
+        rad_output = os.path.join(output_root, 'data_RAD') if output_root != '.' else 'data_RAD'
         datasets['VQA-RAD'] = {
             'files': [
-                os.path.join(rad_root, 'trainset.json'),
-                os.path.join(rad_root, 'testset.json')  # Include test set for complete answer coverage
+                os.path.join(rad_input, 'trainset.json'),
+                os.path.join(rad_input, 'testset.json')  # Include test set for complete answer coverage
             ],
-            'output': os.path.join(rad_root, 'answer_all_list.json'),
+            'output': os.path.join(rad_output, 'answer_all_list.json'),
             'normalize': False  # RAD uses mixed case (Yes/No)
         }
     
     # PathVQA
     if 'all' in args.datasets or 'pathvqa' in args.datasets:
-        path_root = os.path.join(data_root, 'data_PathVQA') if data_root != '.' else 'data_PathVQA'
+        path_input = os.path.join(data_root, 'data_PathVQA') if data_root != '.' else 'data_PathVQA'
+        path_output = os.path.join(output_root, 'data_PathVQA') if output_root != '.' else 'data_PathVQA'
         datasets['PathVQA'] = {
             'files': [
-                os.path.join(path_root, 'trainset.json'),
-                os.path.join(path_root, 'valset.json')
+                os.path.join(path_input, 'trainset.json'),
+                os.path.join(path_input, 'valset.json')
             ],
-            'output': os.path.join(path_root, 'answer_trainval_list.json'),
+            'output': os.path.join(path_output, 'answer_trainval_list.json'),
             'normalize': False  # Keep original case
         }
     
     # Slake (optional)
     if 'all' in args.datasets or 'slake' in args.datasets:
-        slake_root = os.path.join(data_root, 'data_Slake') if data_root != '.' else 'data_Slake'
-        if os.path.exists(slake_root) or data_root != '.':
+        slake_input = os.path.join(data_root, 'data_Slake') if data_root != '.' else 'data_Slake'
+        slake_output = os.path.join(output_root, 'data_Slake') if output_root != '.' else 'data_Slake'
+        if os.path.exists(slake_input) or data_root != '.':
             datasets['Slake'] = {
                 'files': [
-                    os.path.join(slake_root, 'en', 'slake_train.json'),
-                    os.path.join(slake_root, 'en', 'slake_val.json')
+                    os.path.join(slake_input, 'en', 'slake_train.json'),
+                    os.path.join(slake_input, 'en', 'slake_val.json')
                 ],
-                'output': os.path.join(slake_root, 'en', 'answer_trainval_list.json'),
+                'output': os.path.join(slake_output, 'en', 'answer_trainval_list.json'),
                 'normalize': False
             }
     
