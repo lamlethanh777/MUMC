@@ -220,7 +220,9 @@ if __name__ == '__main__':
 
     args.output_dir = './output/V2/vqa/' + args.dataset_use + args.output_suffix
 
-    config = yaml.load(open(args.config, 'r'), Loader=yaml.Loader)
+    yaml_loader = yaml.YAML(typ='safe', pure=True)
+    with open(args.config, 'r') as f:
+        config = yaml_loader.load(f)
 
     args.result_dir = os.path.join(args.output_dir, 'result')
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
