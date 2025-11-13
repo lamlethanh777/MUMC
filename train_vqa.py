@@ -105,7 +105,18 @@ def main(args, config):
     #### Creating Model ####
     print("Creating model")
     model = MUMC_VQA(config=config, text_encoder=args.text_encoder, text_decoder=args.text_decoder, tokenizer=tokenizer)
-    model = model.to(device)
+    
+    # Check if model contains meta tensors and handle appropriately
+    try:
+        model = model.to(device)
+    except NotImplementedError as e:
+        if "meta tensor" in str(e):
+            print("Model contains meta tensors, using to_empty() instead of to()")
+            model = model.to_empty(device=device)
+            model = model.to(device)
+        else:
+            raise
+    
     # print(model)
     optimizer = torch.optim.AdamW(params=model.parameters(), lr=config['init_lr'], weight_decay=config['weight_decay'])
 
